@@ -1,0 +1,41 @@
+---
+description: Onde buscar contexto de domínio do Integrador antes de implementar ou revisar.
+alwaysApply: true
+---
+
+# Contexto dos sistemas
+
+Antes de planejar, implementar, testar ou revisar, **carregue contexto de domínio** nesta ordem:
+
+## 1. Documentação canônica (prioridade)
+
+| Repo | Pasta | Conteúdo típico |
+|------|-------|------------------|
+| Backend | `integrador/_docs/` | `SPEC-*`, `ADR-*`, `README.md` por domínio (erp, crm, leads, agenda, auth, social_media, …) |
+| Frontend | `integrador-front-end/.docs/` | Telas/fluxos (ex.: erp/finance, permission) |
+
+**Como achar o doc certo**
+
+1. Pelo ticket, feature ou caminho de código (`views/crm`, `api/v3`, etc.), mapeie o **domínio** (subpasta em `_docs` ou `.docs`).
+2. Leia o `README.md` do domínio, se existir.
+3. Busque por palavras-chave em títulos (`SPEC-`, `ADR-`, nome do módulo).
+4. Leia os arquivos diretamente relevantes **antes** de propor mudanças.
+
+A documentação **prevalece** sobre suposição quando descreve contrato, fluxo ou regra de negócio.
+
+## 2. Código-fonte (quando o doc não cobre a tarefa)
+
+Se não houver spec/ADR/doc para o escopo pedido, ou estiver desatualizado em relação ao pedido:
+
+1. **Varra o código** com busca por módulo, rota, serializer, service, view, hook ou componente.
+2. Siga imports e chamadas a partir do ponto de entrada (URL, `appsRoute`, service usado na tela).
+3. Registre no chat: *“Não encontrei doc em `_docs`/`.docs`; contexto obtido em: …”* com paths principais.
+
+Não invente comportamento de negócio sem evidência em doc **ou** código.
+
+## 3. Agentes e skills
+
+- Backend: começar em `integrador/_docs/`, depois `integrador/`.
+- Frontend: começar em `integrador-front-end/.docs/`, depois `src/` e `tests/`.
+- Revisão PR / segurança / testes: mesma ordem para validar alinhamento ticket ↔ doc ↔ diff.
+- `shortcut-ticket-development`: citar specs lidas no plano; se ausentes, listar arquivos de código a investigar.

@@ -1,0 +1,52 @@
+---
+description: Revisão formal de PR frontend React/TypeScript com Shortcut e GitHub MCP. Exige story e URL do PR.
+alwaysApply: false
+model: composer-2.5-fast
+---
+
+# Revisão de PR — React / TypeScript
+
+Revisão formal do **`integrador-front-end/`**. Shortcut + GitHub via MCP.
+
+## Modelo (obrigatório)
+
+Sessões e subagentes deste perfil usam **Composer 2.5 Fast** — slug `composer-2.5-fast`. Ao delegar via Task, passe `model: composer-2.5-fast`; não use `inherit` nem modelos mais lentos salvo pedido explícito do usuário.
+
+## Entradas obrigatórias
+
+- **Story Shortcut** (ID público)
+- **URL do PR**
+
+## Passo 0 — Contexto (MCP)
+
+1. `stories-get-by-id` — critérios de aceite viram checklist.
+2. PR: diff completo, threads existentes.
+3. Domínio: `integrador-front-end/.docs/` e, se API, `integrador/_docs/`. Sem doc, varrer `src/`/`tests/` além do diff.
+4. Erro → parar e informar.
+
+## Passos 1–10
+
+Mesma estrutura do agente em `integrador-front-end/.cursor/rules/pr-review.mdc`, resumida:
+
+1. Ticket e escopo  
+2. Estrutura `src/` e componentes padrão (ButtonStandard, inputs WithLabel, `useVehicleFieldHandler`)  
+3. React, Redux, performance  
+4. TypeScript (sem `any`)  
+5. Segurança frontend  
+6. A11y  
+7. Tailwind / design system  
+8. Testes Vitest em `tests/`  
+9. Contrato de API  
+10. Código limpo  
+
+Skills: `react-best-practices`, `react-ui-patterns`.
+
+## Passo 11 — Saída (PT-BR)
+
+**Resumo** | **Alinhamento** | **Achados** `[BLOCKER]` `[SHOULD]` `[NIT]` | **Veredito**
+
+## Passo 12 — GitHub
+
+Inline nos BLOCKER/SHOULD; review top-level; estado da review; relatório final ao dev.
+
+Não deixe review só no chat.

@@ -1,0 +1,176 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+  --si-surface: #f6f5f5;
+  --si-surface-dim: #ebeaea;
+  --si-surface-container-lowest: #ffffff;
+  --si-surface-container-low: #f0efef;
+  --si-surface-container: #e8e7e7;
+  --si-surface-container-high: #dedddd;
+  --si-surface-container-highest: #d4d3d3;
+  --si-surface-bright: #ffffff;
+  --si-surface-variant: #e0dfe3;
+  --si-on-surface: #1a1a1a;
+  --si-on-surface-variant: #5c5a62;
+  --si-on-background: #1a1a1a;
+  --si-outline: #948e9e;
+  --si-outline-variant: #c9c5d0;
+  --si-primary: #4a249d;
+  --si-on-primary: #ffffff;
+  --si-primary-container: #e9ddff;
+  --si-on-primary-container: #22005d;
+  --si-primary-fixed: #4a249d;
+  --si-on-primary-fixed: #22005d;
+  --si-secondary: #009fbd;
+  --si-on-secondary: #ffffff;
+  --si-secondary-container: #b0ecff;
+  --si-on-secondary-container: #002e39;
+  --si-tertiary: #7a6528;
+  --si-on-tertiary: #ffffff;
+  --si-tertiary-container: #f7e0ad;
+  --si-on-tertiary-container: #241a00;
+  --si-error: #ba1a1a;
+  --si-inverse-surface: #313033;
+  --si-inverse-on-surface: #f4eff4;
+  --si-scrim: rgb(26 26 26 / 0.5);
+}
+
+.dark {
+  color-scheme: dark;
+  --si-surface: #12131a;
+  --si-surface-dim: #12131a;
+  --si-surface-container-lowest: #0d0e15;
+  --si-surface-container-low: #1a1b22;
+  --si-surface-container: #1e1f26;
+  --si-surface-container-high: #292931;
+  --si-surface-container-highest: #34343c;
+  --si-surface-bright: #383941;
+  --si-surface-variant: #34343c;
+  --si-on-surface: #e3e1ec;
+  --si-on-surface-variant: #cbc3d5;
+  --si-on-background: #e3e1ec;
+  --si-outline: #948e9e;
+  --si-outline-variant: #494552;
+  --si-primary: #cfbdff;
+  --si-on-primary: #3a088d;
+  --si-primary-container: #4a249d;
+  --si-on-primary-container: #b79dff;
+  --si-primary-fixed: #e9ddff;
+  --si-on-primary-fixed: #e9ddff;
+  --si-secondary: #60d5f5;
+  --si-on-secondary: #003641;
+  --si-secondary-container: #009ebc;
+  --si-on-secondary-container: #002e39;
+  --si-tertiary: #dac493;
+  --si-on-tertiary: #3c2f0b;
+  --si-tertiary-container: #bda97a;
+  --si-on-tertiary-container: #4c3e18;
+  --si-error: #ffb4ab;
+  --si-inverse-surface: #e3e1ec;
+  --si-inverse-on-surface: #2f3038;
+  --si-scrim: rgb(0 0 0 / 0.6);
+}
+
+@theme {
+  --color-surface: var(--si-surface);
+  --color-surface-dim: var(--si-surface-dim);
+  --color-surface-container-lowest: var(--si-surface-container-lowest);
+  --color-surface-container-low: var(--si-surface-container-low);
+  --color-surface-container: var(--si-surface-container);
+  --color-surface-container-high: var(--si-surface-container-high);
+  --color-surface-container-highest: var(--si-surface-container-highest);
+  --color-surface-bright: var(--si-surface-bright);
+  --color-surface-variant: var(--si-surface-variant);
+  --color-on-surface: var(--si-on-surface);
+  --color-on-surface-variant: var(--si-on-surface-variant);
+  --color-on-background: var(--si-on-background);
+  --color-outline: var(--si-outline);
+  --color-outline-variant: var(--si-outline-variant);
+  --color-primary: var(--si-primary);
+  --color-on-primary: var(--si-on-primary);
+  --color-primary-container: var(--si-primary-container);
+  --color-on-primary-container: var(--si-on-primary-container);
+  --color-primary-fixed: var(--si-primary-fixed);
+  --color-on-primary-fixed: var(--si-on-primary-fixed);
+  --color-secondary: var(--si-secondary);
+  --color-on-secondary: var(--si-on-secondary);
+  --color-secondary-container: var(--si-secondary-container);
+  --color-on-secondary-container: var(--si-on-secondary-container);
+  --color-tertiary: var(--si-tertiary);
+  --color-on-tertiary: var(--si-on-tertiary);
+  --color-tertiary-container: var(--si-tertiary-container);
+  --color-on-tertiary-container: var(--si-on-tertiary-container);
+  --color-error: var(--si-error);
+  --color-inverse-surface: var(--si-inverse-surface);
+  --color-inverse-on-surface: var(--si-inverse-on-surface);
+  --color-scrim: var(--si-scrim);
+
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.375rem;
+  --spacing-space-md: 0.75rem;
+  --spacing-space-lg: 1rem;
+  --spacing-space-xl: 1.5rem;
+  --spacing-gutter: 0.75rem;
+  --spacing-gutter-md: 1rem;
+  --spacing-margin: 1rem;
+  --spacing-margin-md: 1.5rem;
+
+  --font-family-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-family-headline: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-b3-green: #10b981;
+  --color-b3-green-soft: rgb(16 185 129 / 0.12);
+  --color-b3-red: #f43f5e;
+  --color-b3-blue: #38bdf8;
+  --color-b3-amber: #f59e0b;
+
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overscroll-behavior: none;
+  font-family: var(--font-family-sans);
+  background: var(--si-surface);
+  color: var(--si-on-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.font-headline {
+  font-family: var(--font-family-headline);
+}
+
+.font-mono-financial {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+  user-select: none;
+}

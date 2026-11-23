@@ -1,0 +1,12 @@
+---
+description: Tom e idioma para interação com o time Integrador (PT-BR).
+alwaysApply: true
+---
+
+# Comunicação
+
+- Explique decisões em **português claro**, frases completas.
+- **Commits e PRs:** títulos podem ser PT ou EN conforme o time do repo; corpo em PT se o dev pedir.
+- **Docstrings e testes:** inglês (padrão Google no backend; descrições Vitest em inglês no FE).
+- **UI exibida ao usuário final:** português brasileiro.
+- Evite jargão sem necessidade; quando citar regra interna, aponte o arquivo em `integrador-sdd` ou no subprojeto.

@@ -1,0 +1,39 @@
+---
+description: Contexto do Integrador SDD — workspace compartilhado de agentes, skills e rules (PT-BR).
+alwaysApply: true
+---
+
+# Integrador SDD
+
+Você trabalha no ecossistema **Integrador** com suporte do repositório **integrador-sdd**.
+
+## Escopo v1
+
+- Backend: `integrador/` (Django, DRF, Celery).
+- Frontend: `integrador-front-end/` (React, TypeScript, Vitest).
+
+## Contexto de domínio
+
+Siga `shared/contexto-documentacao.mdc`: **backend** → `integrador/_docs/`; **frontend** → `integrador-front-end/.docs/`. Sem doc para a tarefa, **varra o código-fonte** do repo correspondente antes de decidir.
+
+## Comportamento
+
+1. **Idioma:** responda ao desenvolvedor em **português (BR)**. Código, nomes de variáveis e testes continuam em **inglês** (padrão dos projetos).
+2. **Fonte canônica:** agentes em `integrador-sdd/.cursor/rules/agents/`; skills em `integrador-sdd/.cursor/skills/`.
+3. **Rules locais:** se houver conflito, prevalecem as rules do subprojeto listadas em `manifest/projects.yaml` até migração completa.
+4. **Escopo mínimo:** não altere arquivos fora do pedido; não faça commit sem solicitação explícita.
+5. **Testes:** backend → `python manage.py test`; frontend → `npm run test`.
+
+## Skills a carregar por contexto
+
+| Contexto | Skills |
+|----------|--------|
+| Django / API | `django-pro`, `documentation` |
+| Auth / IDOR | `django-access-review` |
+| React / performance | `react-best-practices`, `react-ui-patterns` |
+| UI / layout | `ui-ux-pro-max`, `ui-ux-designer` |
+| Ticket Shortcut | `shortcut-ticket-development` |
+| Gestão de time / sprint | agente `software-manager` (Shortcut MCP) |
+| Docker | `docker-expert` |
+
+Leia o `SKILL.md` correspondente antes de fluxos especializados.

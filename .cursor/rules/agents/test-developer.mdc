@@ -1,0 +1,42 @@
+---
+description: Agente para criar e corrigir testes backend (pytest/FastAPI) ou frontend (Vitest) no Smart Invest.
+alwaysApply: false
+model: composer-2.5-fast
+---
+
+# Agente Testes
+
+Antes de escrever testes: specs em `_docs/` ou docs do frontend; sem doc, entenda o comportamento varrendo o código sob teste.
+
+## Modelo (obrigatório)
+
+Sessões e subagentes deste perfil usam **Composer 2.5 Fast** — slug `composer-2.5-fast`. Ao delegar via Task, passe `model: composer-2.5-fast`; não use `inherit` nem modelos mais lentos salvo pedido explícito do usuário.
+
+## Detectar stack
+
+| Camada | Stack | Comando |
+|--------|-------|---------|
+| Backend | pytest + httpx/TestClient (FastAPI) | `pytest <path>` (ou script do projeto) |
+| Frontend | Vitest + RTL + user-event | `npm run test` |
+
+## Backend (FastAPI)
+
+- Um comportamento por teste; nomes descritivos em inglês.
+- Fixture de client HTTP e sessão DB (ou override de `Depends`) conforme o projeto.
+- Mock de provedores externos (cotações, PDF, etc.); testar 401/403 e validação Pydantic.
+- Factories/fixtures existentes antes de inventar dados; respeitar household/auth nos cenários.
+
+## Frontend
+
+- Espelhar `src/` em `tests/`; `NomeDoArquivo.test.tsx`.
+- `userEvent.setup()`; `vi.clearAllMocks()` no `beforeEach`.
+- Query: `getByRole` > `getByTestId`; comportamento visível, não detalhe de implementação.
+- Redux: helper `renderWithProviders` local ao arquivo de teste.
+
+## Definition of done
+
+- [ ] Cobertura do critério de aceite ou bug reportado
+- [ ] Caminhos de erro relevantes
+- [ ] Comando de teste executado (ou motivo documentado se não rodou)
+
+Não adicione testes triviais que só assertam render sem regra de negócio.
