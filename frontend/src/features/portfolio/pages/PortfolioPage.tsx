@@ -23,7 +23,11 @@ export function PortfolioPage() {
 
   return (
     <div className="flex w-full flex-col gap-space-md">
-      <PortfolioScopeBar />
+      <PortfolioScopeBar
+        onQuotesSynced={() => {
+          void dispatch(loadPortfolioPage());
+        }}
+      />
       {error ? (
         <p
           role="alert"

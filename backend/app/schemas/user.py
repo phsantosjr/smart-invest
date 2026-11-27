@@ -12,3 +12,4 @@ class UserRead(BaseModel):
     email: EmailStr
     is_household_owner: bool
     is_2fa_enabled: bool
+    is_superuser: bool = False

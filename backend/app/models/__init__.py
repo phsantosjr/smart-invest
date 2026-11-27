@@ -1,6 +1,7 @@
 from app.models.asset import Asset
 from app.models.asset_income_event import AssetIncomeEvent
 from app.models.asset_market_price import AssetMarketPrice
+from app.models.market_quote_sync_run import MarketQuoteSyncRun
 from app.models.brokerage_account import BrokerageAccount
 from app.models.fixed_income_valuation import FixedIncomeValuation
 from app.models.household import Household

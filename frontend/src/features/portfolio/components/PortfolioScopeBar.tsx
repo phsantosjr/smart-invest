@@ -4,8 +4,13 @@ import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import type { PortfolioScopeId } from "../../../types/portfolio";
 import { MaterialIcon } from "../../../components/MaterialIcon";
 import { setPortfolioScope } from "../portfolioSlice";
+import { MarketQuoteSyncButton } from "./MarketQuoteSyncButton";
 
-export function PortfolioScopeBar() {
+type PortfolioScopeBarProps = {
+  onQuotesSynced?: () => void;
+};
+
+export function PortfolioScopeBar({ onQuotesSynced }: PortfolioScopeBarProps) {
   const dispatch = useAppDispatch();
   const scope = useAppSelector((state) => state.portfolio.scope);
   const data = useAppSelector((state) => state.portfolio.data);
@@ -59,7 +64,8 @@ export function PortfolioScopeBar() {
         })}
       </div>
 
-      <div className="flex shrink-0 items-center gap-space-sm">
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-space-sm">
+        <MarketQuoteSyncButton onSynced={onQuotesSynced} />
         <Link
           to="/transactions"
           className="flex h-9 items-center gap-space-xs rounded bg-primary-container px-space-md text-xs font-semibold text-primary-fixed shadow-sm transition-colors hover:opacity-90"

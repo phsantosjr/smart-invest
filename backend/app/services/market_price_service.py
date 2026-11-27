@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.asset import Asset
 from app.models.asset_market_price import SOURCE_MANUAL, AssetMarketPrice
+from app.integrations.quotes.base import QuoteResult
 from app.models.user import User
 from app.schemas.market_price import MarketPriceCreate
 from app.services.errors import DomainError
@@ -79,6 +80,30 @@ async def create_manual_market_price(
     session.add(record)
     await session.commit()
     await session.refresh(record)
+    return record
+
+
+async def create_provider_market_price(
+    session: AsyncSession,
+    *,
+    asset_id: UUID,
+    quote: QuoteResult,
+) -> AssetMarketPrice:
+    await _get_asset_or_raise(session, asset_id)
+
+    quoted_at = quote.quoted_at
+    if quoted_at.tzinfo is None:
+        quoted_at = quoted_at.replace(tzinfo=UTC)
+
+    record = AssetMarketPrice(
+        asset_id=asset_id,
+        price=quantize_price(quote.price),
+        quoted_at=quoted_at,
+        source=quote.source,
+        recorded_by_user_id=None,
+    )
+    session.add(record)
+    await session.flush()
     return record
 
 

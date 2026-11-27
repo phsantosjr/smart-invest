@@ -8,6 +8,7 @@ import {
   assetTypeLabel,
   buildAssetDetailRows,
 } from "../../transactions/utils/assetDisplay";
+import { AssetMarketPricePanel } from "../components/AssetMarketPricePanel";
 import {
   clearAssetsError,
   createAsset,
@@ -313,7 +314,7 @@ function AssetsTableSection(props: {
   } = props;
 
   return (
-    <div className="grid gap-space-md lg:grid-cols-[minmax(0,1fr)_18rem]">
+    <div className="grid gap-space-md lg:grid-cols-[minmax(0,1fr)_21rem]">
       <section className="rounded-lg bg-surface-container-low p-space-md shadow-sm">
         <div className="mb-space-md flex flex-col gap-space-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-1">
@@ -472,6 +473,7 @@ function DetailReport({ asset }: { asset: Asset }) {
           Ver na carteira
         </Link>
       </div>
+      <AssetMarketPricePanel asset={asset} />
     </div>
   );
 }

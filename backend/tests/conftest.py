@@ -2,6 +2,8 @@ import os
 
 # Ensure settings validate before app modules load (backend/.env may set a short JWT).
 os.environ.setdefault("JWT_SECRET_KEY", "test-jwt-secret-key-for-pytest-only")
+os.environ.setdefault("MARKET_QUOTE_PROVIDER", "mock")
+os.environ.setdefault("MARKET_QUOTE_SCHEDULE_ENABLED", "false")
 if len(os.environ["JWT_SECRET_KEY"]) < 16:
     os.environ["JWT_SECRET_KEY"] = "test-jwt-secret-key-for-pytest-only"
 
@@ -67,6 +69,7 @@ async def create_user(
     two_factor_secret: str | None = None,
     household_id=None,
     is_household_owner: bool = False,
+    is_superuser: bool = False,
 ) -> User:
     user = User(
         name=name,
@@ -76,6 +79,7 @@ async def create_user(
         two_factor_secret=two_factor_secret,
         household_id=household_id,
         is_household_owner=is_household_owner,
+        is_superuser=is_superuser,
     )
     session.add(user)
     await session.commit()

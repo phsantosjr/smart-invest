@@ -50,6 +50,32 @@ class Settings(BaseSettings):
         ],
     )
 
+    market_quote_provider: str = Field(
+        default="mock",
+        validation_alias="MARKET_QUOTE_PROVIDER",
+    )
+    brapi_token: str = Field(default="", validation_alias="BRAPI_TOKEN")
+    market_quote_fallback_enabled: bool = Field(
+        default=True,
+        validation_alias="MARKET_QUOTE_FALLBACK_ENABLED",
+    )
+    market_quote_schedule_enabled: bool = Field(
+        default=True,
+        validation_alias="MARKET_QUOTE_SCHEDULE_ENABLED",
+    )
+    market_quote_schedule_timezone: str = Field(
+        default="America/Sao_Paulo",
+        validation_alias="MARKET_QUOTE_SCHEDULE_TIMEZONE",
+    )
+    market_quote_schedule_hour: int = Field(
+        default=19,
+        validation_alias="MARKET_QUOTE_SCHEDULE_HOUR",
+    )
+    market_quote_schedule_minute: int = Field(
+        default=0,
+        validation_alias="MARKET_QUOTE_SCHEDULE_MINUTE",
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:

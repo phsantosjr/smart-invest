@@ -9,6 +9,8 @@ import { FixedIncomePage } from "./features/fixed-income/pages/FixedIncomePage";
 import { ComingSoonPage } from "./features/shared/pages/ComingSoonPage";
 import { DividendsPage } from "./features/dividends/pages/DividendsPage";
 import { ProjectionPage } from "./features/projection/pages/ProjectionPage";
+import { MarketQuoteSyncLogsPage } from "./features/market-quotes/pages/MarketQuoteSyncLogsPage";
+import { AssetPriceHistoryPage } from "./features/market-prices/pages/AssetPriceHistoryPage";
 import { NewTransactionPage } from "./features/transactions/pages/NewTransactionPage";
 import { TransactionsPage } from "./features/transactions/pages/TransactionsPage";
 import { AppShell } from "./layouts/AppShell";
@@ -28,6 +30,7 @@ export default function App() {
             }
           >
             <Route path="/portfolio" element={<PortfolioPage />} />
+            <Route path="/market-quotes/logs" element={<MarketQuoteSyncLogsPage />} />
             <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/transactions/new" element={<NewTransactionPage />} />
             <Route path="/dividends" element={<DividendsPage />} />
@@ -44,6 +47,7 @@ export default function App() {
             <Route path="/household" element={<ComingSoonPage title="Família" />} />
             <Route path="/accounts" element={<AccountsPage />} />
             <Route path="/assets" element={<AssetsPage />} />
+            <Route path="/assets/:assetId/price-history" element={<AssetPriceHistoryPage />} />
           </Route>
           <Route path="/" element={<Navigate to="/portfolio" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />

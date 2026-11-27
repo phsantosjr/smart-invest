@@ -16,13 +16,15 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "pyjwt>=2.10.0",
     "pyotp>=2.9.0",
+    "httpx>=0.28.0",
+    "yfinance>=0.2.50",
+    "apscheduler>=3.10.4",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.3.0",
     "pytest-asyncio>=0.24.0",
-    "httpx>=0.28.0",
     "aiosqlite>=0.20.0",
 ]
 

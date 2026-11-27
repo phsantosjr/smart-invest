@@ -5,4 +5,5 @@ export type UserProfile = {
   email: string;
   is_household_owner: boolean;
   is_2fa_enabled: boolean;
+  is_superuser: boolean;
 };

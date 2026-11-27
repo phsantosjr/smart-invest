@@ -17,7 +17,21 @@ const breadcrumbByPath: Record<string, string> = {
   "/household": "Família",
   "/accounts": "Contas & Instituições",
   "/assets": "Ativos",
+  "/market-quotes/logs": "Logs de cotações",
 };
+
+function resolveBreadcrumb(pathname: string): string {
+  if (breadcrumbByPath[pathname]) {
+    return breadcrumbByPath[pathname];
+  }
+  if (pathname.startsWith("/fixed-income/")) {
+    return "Detalhe renda fixa";
+  }
+  if (pathname.match(/^\/assets\/[^/]+\/price-history$/)) {
+    return "Histórico de preços";
+  }
+  return "App";
+}
 
 export function AppShell() {
   const dispatch = useAppDispatch();
@@ -32,9 +46,7 @@ export function AppShell() {
     }
   }, [accessToken, currentUser, dispatch]);
 
-  const breadcrumb =
-    breadcrumbByPath[location.pathname] ??
-    (location.pathname.startsWith("/fixed-income/") ? "Detalhe renda fixa" : "App");
+  const breadcrumb = resolveBreadcrumb(location.pathname);
 
   return (
     <div className="min-h-screen bg-surface font-sans text-sm text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">

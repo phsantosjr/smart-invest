@@ -11,7 +11,14 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    from app.jobs.market_quote_scheduler import (
+        shutdown_market_quote_scheduler,
+        start_market_quote_scheduler,
+    )
+
+    start_market_quote_scheduler()
     yield
+    shutdown_market_quote_scheduler()
 
 
 app = FastAPI(title="Smart Invest API", lifespan=lifespan, version="0.1.0")
