@@ -8,6 +8,7 @@ import { PortfolioPage } from "./features/portfolio/pages/PortfolioPage";
 import { FixedIncomePage } from "./features/fixed-income/pages/FixedIncomePage";
 import { ComingSoonPage } from "./features/shared/pages/ComingSoonPage";
 import { DividendsPage } from "./features/dividends/pages/DividendsPage";
+import { ProjectionPage } from "./features/projection/pages/ProjectionPage";
 import { NewTransactionPage } from "./features/transactions/pages/NewTransactionPage";
 import { TransactionsPage } from "./features/transactions/pages/TransactionsPage";
 import { AppShell } from "./layouts/AppShell";
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/transactions/new" element={<NewTransactionPage />} />
             <Route path="/dividends" element={<DividendsPage />} />
+            <Route path="/projection" element={<ProjectionPage />} />
             <Route path="/fixed-income" element={<FixedIncomePage />} />
             <Route
               path="/fixed-income/:assetId"

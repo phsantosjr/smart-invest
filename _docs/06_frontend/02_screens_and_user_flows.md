@@ -25,7 +25,14 @@
 * **Detalhe e Marcação Manual de Renda Fixa (`/fixed-income/:assetId`):**
   * Exibe metadados do título (`issuer`, `maturity_date`, `indexer`), histórico cronológico de `fixed_income_valuations` e formulário para registrar novo saldo bruto com variação absoluta e percentual no período.
 
-## 4. Importação de Notas de Corretagem
+## 4. Projeção de investimentos
+* **Projeção (`/projection`):**
+  * Parâmetros: escopo (FII / carteira com aviso), aporte mensal, horizonte (até 20 anos), agrupamento mês ou ano, flag de distribuição de aporte pelos últimos rendimentos FII.
+  * Processamento via `POST /api/v1/projections/run` (cálculo no backend).
+  * Resultado: cards patrimônio inicial/final, abas **Tabela** e **Gráfico**.
+  * Spec: `_docs/09_projection/01_fii_projection_mvp.md`.
+
+## 5. Importação de Notas de Corretagem
 * **Importar Nota PDF (`/imports/brokerage-note`):**
   * Seleção da conta de corretora de destino e upload de arquivo `.pdf` da B3.
   * Exibe o resumo das transações extraídas/gravadas e atualiza a visão da carteira em seguida.

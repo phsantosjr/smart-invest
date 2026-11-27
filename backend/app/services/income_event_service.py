@@ -359,6 +359,35 @@ def _validate_income_type_for_asset(asset: Asset, income_type: str) -> None:
         )
 
 
+async def _find_duplicate_income_event(
+    session: AsyncSession,
+    user_id: UUID,
+    *,
+    asset_id: UUID,
+    payment_date: date,
+    income_type: str,
+    gross_amount: Decimal,
+) -> bool:
+    """Same asset, payment date, income type and gross amount for this user."""
+    stmt = (
+        select(AssetIncomeEvent.id)
+        .join(
+            BrokerageAccount,
+            AssetIncomeEvent.brokerage_account_id == BrokerageAccount.id,
+        )
+        .where(
+            BrokerageAccount.user_id == user_id,
+            AssetIncomeEvent.asset_id == asset_id,
+            AssetIncomeEvent.payment_date == payment_date,
+            AssetIncomeEvent.income_type == income_type,
+            AssetIncomeEvent.gross_amount == gross_amount,
+        )
+        .limit(1)
+    )
+    existing_id = await session.scalar(stmt)
+    return existing_id is not None
+
+
 async def create_income_event(
     session: AsyncSession,
     current_user: User,
@@ -368,6 +397,19 @@ async def create_income_event(
     asset = await _get_asset_or_raise(session, body.asset_id)
     normalized = _normalize_create(body)
     _validate_income_type_for_asset(asset, normalized.income_type)
+
+    if await _find_duplicate_income_event(
+        session,
+        current_user.id,
+        asset_id=normalized.asset_id,
+        payment_date=normalized.payment_date,
+        income_type=normalized.income_type,
+        gross_amount=normalized.gross_amount,
+    ):
+        raise DomainError(
+            "Já existe um provento com o mesmo ativo, data de pagamento, valor e tipo.",
+            409,
+        )
 
     record = AssetIncomeEvent(
         brokerage_account_id=normalized.brokerage_account_id,

@@ -34,6 +34,7 @@ import {
   computeIncomeNetPreview,
   suggestedIncomeType,
 } from "../utils/incomePreview";
+import { isoDateOffset } from "../utils/dateRange";
 import {
   computeTransactionTotal,
   computeTransactionTotalBreakdown,
@@ -55,12 +56,6 @@ const FIXED_INCOME_ASSET_TYPES = new Set<AssetType>(["FIXED_INCOME", "TREASURY"]
 
 const selectFieldClassName =
   "w-full cursor-pointer appearance-none rounded-xl border border-outline-variant/40 bg-surface-container-low py-2.5 pr-9 pl-10 text-xs text-on-surface transition-all focus:border-primary-fixed focus:ring-2 focus:ring-primary-fixed/40 focus:outline-none";
-
-function isoDateOffset(daysFromToday: number): string {
-  const date = new Date();
-  date.setDate(date.getDate() + daysFromToday);
-  return date.toISOString().slice(0, 10);
-}
 
 export function NewTransactionPage() {
   const dispatch = useAppDispatch();

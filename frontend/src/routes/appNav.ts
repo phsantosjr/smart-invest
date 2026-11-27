@@ -9,6 +9,7 @@ export const appNavItems: AppNavItem[] = [
   { path: "/portfolio", label: "Dashboard / Carteira", icon: "dashboard", end: true },
   { path: "/transactions", label: "Lançamentos", icon: "sync_alt", end: true },
   { path: "/dividends", label: "Dividendos", icon: "paid", end: true },
+  { path: "/projection", label: "Projeção", icon: "timeline", end: true },
   { path: "/assets", label: "Ativos", icon: "inventory_2" },
   { path: "/fixed-income", label: "Renda Fixa", icon: "trending_up" },
   { path: "/imports/brokerage-note", label: "Importar PDF / B3", icon: "upload_file" },

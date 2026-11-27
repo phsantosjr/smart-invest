@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -7,6 +7,7 @@ import { store } from "../src/app/store";
 import { ThemeProvider } from "../src/app/ThemeProvider";
 import { setAccessToken } from "../src/features/auth/authSlice";
 import { TransactionsPage } from "../src/features/transactions/pages/TransactionsPage";
+import { dateRangeForPreset } from "../src/features/transactions/utils/dateRange";
 import * as accountsApi from "../src/services/accountsApi";
 import * as incomeEventsApi from "../src/services/incomeEventsApi";
 import * as portfolioApi from "../src/services/portfolioApi";
@@ -110,5 +111,62 @@ describe("TransactionsPage", () => {
     expect(await screen.findByRole("heading", { name: "Lançamentos" })).toBeTruthy();
     expect(await screen.findByText("PETR4")).toBeTruthy();
     expect(screen.getByRole("link", { name: /Novo lançamento/i })).toBeTruthy();
+  });
+
+  it("applies últimos 7 dias preset to API params", async () => {
+    const expected = dateRangeForPreset("last7");
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider>
+          <MemoryRouter>
+            <TransactionsPage />
+          </MemoryRouter>
+        </ThemeProvider>
+      </Provider>,
+    );
+
+    await screen.findByText("PETR4");
+
+    fireEvent.click(screen.getByRole("button", { name: "Últimos 7 dias" }));
+
+    await waitFor(() => {
+      expect(transactionsApi.fetchTransactions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          start_date: expected.startDate,
+          end_date: expected.endDate,
+        }),
+      );
+    });
+  });
+
+  it("sends date range params when filtering", async () => {
+    render(
+      <Provider store={store}>
+        <ThemeProvider>
+          <MemoryRouter>
+            <TransactionsPage />
+          </MemoryRouter>
+        </ThemeProvider>
+      </Provider>,
+    );
+
+    await screen.findByText("PETR4");
+
+    fireEvent.change(screen.getByLabelText("Data inicial"), {
+      target: { value: "2026-01-01" },
+    });
+    fireEvent.change(screen.getByLabelText("Data final"), {
+      target: { value: "2026-03-31" },
+    });
+
+    await waitFor(() => {
+      expect(transactionsApi.fetchTransactions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          start_date: "2026-01-01",
+          end_date: "2026-03-31",
+        }),
+      );
+    });
   });
 });

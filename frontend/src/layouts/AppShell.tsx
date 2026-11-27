@@ -11,6 +11,7 @@ const breadcrumbByPath: Record<string, string> = {
   "/transactions": "Lançamentos",
   "/transactions/new": "Novo lançamento",
   "/dividends": "Dividendos",
+  "/projection": "Projeção",
   "/fixed-income": "Renda fixa",
   "/imports/brokerage-note": "Importar nota",
   "/household": "Família",

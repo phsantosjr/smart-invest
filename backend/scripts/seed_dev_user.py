@@ -13,7 +13,7 @@ from app.core.security import hash_password
 from app.models.user import User
 
 DEV_EMAIL = "ph@phgr.tech"
-DEV_PASSWORD = "@@1234@@ab"
+DEV_PASSWORD = ""
 
 
 async def seed() -> None:

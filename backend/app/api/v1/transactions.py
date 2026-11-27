@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Annotated, NoReturn
 from uuid import UUID
 
@@ -27,6 +28,8 @@ async def list_transactions(
     current_user: Annotated[User, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_db)],
     brokerage_account_id: Annotated[UUID | None, Query()] = None,
+    start_date: Annotated[date | None, Query()] = None,
+    end_date: Annotated[date | None, Query()] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
 ) -> TransactionListResponse:
@@ -35,6 +38,8 @@ async def list_transactions(
             session,
             current_user,
             brokerage_account_id=brokerage_account_id,
+            start_date=start_date,
+            end_date=end_date,
             page=page,
             page_size=page_size,
         )

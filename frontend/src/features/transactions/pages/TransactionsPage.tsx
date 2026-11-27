@@ -16,6 +16,11 @@ import { INCOME_TYPE_LABEL } from "../../../types/incomeEvents";
 import type { TransactionListItem } from "../../../types/transactions";
 import { formatBrl, formatQuantity, formatUnitPrice } from "../../../utils/money";
 import { formatIsoDate } from "../utils/assetDisplay";
+import {
+  TRANSACTION_DATE_RANGE_PRESETS,
+  dateRangeForPreset,
+  matchesDateRangePreset,
+} from "../utils/dateRange";
 
 function formatDisplayDate(iso: string): string {
   return formatIsoDate(iso);
@@ -34,6 +39,8 @@ export function TransactionsPage() {
   const [items, setItems] = useState<TransactionListItem[]>([]);
   const [incomeItems, setIncomeItems] = useState<IncomeEvent[]>([]);
   const [accountFilter, setAccountFilter] = useState<string>("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
   const [totalTransactions, setTotalTransactions] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -60,21 +67,36 @@ export function TransactionsPage() {
     };
   }, []);
 
+  const dateRangeInvalid = Boolean(
+    startDate && endDate && startDate > endDate,
+  );
+
   useEffect(() => {
     let active = true;
     async function loadLedger() {
+      if (dateRangeInvalid) {
+        setError("A data inicial não pode ser posterior à data final.");
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError(null);
       try {
         const accountParam = accountFilter === "all" ? undefined : accountFilter;
+        const dateParams = {
+          ...(startDate.trim() ? { start_date: startDate.trim() } : {}),
+          ...(endDate.trim() ? { end_date: endDate.trim() } : {}),
+        };
         const [transactions, income, assetCatalog] = await Promise.all([
           transactionsApi.fetchTransactions({
             brokerage_account_id: accountParam,
             page,
             page_size: DEFAULT_TRANSACTION_PAGE_SIZE,
+            ...dateParams,
           }),
           incomeEventsApi.fetchIncomeEvents({
             brokerage_account_id: accountParam,
+            ...dateParams,
           }),
           portfolioApi.fetchAssets(),
         ]);
@@ -98,7 +120,7 @@ export function TransactionsPage() {
     return () => {
       active = false;
     };
-  }, [accountFilter, page]);
+  }, [accountFilter, dateRangeInvalid, endDate, page, startDate]);
 
   useEffect(() => {
     if (!incomeSaved) {
@@ -133,24 +155,95 @@ export function TransactionsPage() {
       </header>
 
       <section className="rounded-lg bg-surface-container-low p-space-md shadow-sm">
-        <label className="mb-space-md flex max-w-md flex-col gap-1 text-xs">
-          <span className="font-semibold text-on-surface-variant">Conta</span>
-          <select
-            value={accountFilter}
-            onChange={(e) => {
-              setAccountFilter(e.target.value);
-              setPage(1);
-            }}
-            className="rounded border border-outline-variant/40 bg-surface px-3 py-2 text-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary"
-          >
-            <option value="all">Todas as minhas contas</option>
-            {accounts.map((account) => (
-              <option key={account.id} value={account.id}>
-                {accountLabelById.get(account.id)}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="mb-space-md grid grid-cols-1 gap-space-md sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
+          <label className="flex flex-col gap-1 text-xs">
+            <span className="font-semibold text-on-surface-variant">Conta</span>
+            <select
+              value={accountFilter}
+              onChange={(e) => {
+                setAccountFilter(e.target.value);
+                setPage(1);
+              }}
+              className="rounded border border-outline-variant/40 bg-surface px-3 py-2 text-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary"
+            >
+              <option value="all">Todas as minhas contas</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {accountLabelById.get(account.id)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label htmlFor="tx-filter-start" className="flex flex-col gap-1 text-xs">
+            <span className="font-semibold text-on-surface-variant">Data inicial</span>
+            <input
+              id="tx-filter-start"
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setPage(1);
+              }}
+              className="rounded border border-outline-variant/40 bg-surface px-3 py-2 text-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary"
+            />
+          </label>
+          <label htmlFor="tx-filter-end" className="flex flex-col gap-1 text-xs">
+            <span className="font-semibold text-on-surface-variant">Data final</span>
+            <input
+              id="tx-filter-end"
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setPage(1);
+              }}
+              className="rounded border border-outline-variant/40 bg-surface px-3 py-2 text-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary"
+            />
+          </label>
+          <div className="flex flex-wrap items-center gap-2">
+            {(startDate || endDate) ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                  setPage(1);
+                }}
+                className="rounded-lg border border-outline-variant/40 px-3 py-2 text-xs font-semibold text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+              >
+                Limpar período
+              </button>
+            ) : null}
+          </div>
+        </div>
+        <div className="mb-space-md flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+          <span className="text-xs font-semibold text-on-surface-variant">Período rápido</span>
+          <div className="flex flex-wrap gap-2">
+            {TRANSACTION_DATE_RANGE_PRESETS.map((preset) => {
+              const active = matchesDateRangePreset(startDate, endDate, preset.id);
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => {
+                    const range = dateRangeForPreset(preset.id);
+                    setStartDate(range.startDate);
+                    setEndDate(range.endDate);
+                    setPage(1);
+                  }}
+                  className={
+                    active
+                      ? "rounded-lg border border-secondary/50 bg-secondary-container/25 px-3 py-2 text-xs font-semibold text-on-surface"
+                      : "rounded-lg border border-outline-variant/40 px-3 py-2 text-xs font-semibold text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+                  }
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {successHint ? (
           <p
@@ -167,9 +260,15 @@ export function TransactionsPage() {
           </p>
         ) : loading ? (
           <p className="text-sm text-on-surface-variant">Carregando…</p>
+        ) : dateRangeInvalid ? (
+          <p className="text-sm text-on-surface-variant">
+            Ajuste o intervalo de datas para ver os lançamentos.
+          </p>
         ) : totalTransactions === 0 && incomeItems.length === 0 ? (
           <p className="text-sm text-on-surface-variant">
-            Nenhum lançamento nesta conta.{" "}
+            {startDate || endDate
+              ? "Nenhum lançamento no período selecionado."
+              : "Nenhum lançamento nesta conta."}{" "}
             <Link to="/transactions/new" className="font-medium text-secondary hover:underline">
               Criar o primeiro
             </Link>

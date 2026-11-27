@@ -131,3 +131,50 @@ async def test_list_transactions_pagination(
     )
     assert page3.status_code == 200
     assert len(page3.json()["items"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_list_transactions_date_range(
+    client: AsyncClient,
+    db_session: AsyncSession,
+):
+    user = await create_user(db_session, email="range@test.com", password="secret123")
+    institution = await create_institution(db_session)
+    account = await create_brokerage_account(
+        db_session,
+        user=user,
+        institution=institution,
+        account_number="444",
+    )
+    asset = await create_asset(db_session, ticker="ITUB4", name="Itau")
+
+    for tx_date in (date(2026, 5, 1), date(2026, 5, 15), date(2026, 6, 1)):
+        db_session.add(
+            Transaction(
+                brokerage_account_id=account.id,
+                asset_id=asset.id,
+                transaction_type="BUY",
+                quantity=Decimal("1"),
+                unit_price=Decimal("10"),
+                fees=Decimal("0"),
+                total_amount=Decimal("10"),
+                transaction_date=tx_date,
+            ),
+        )
+    await db_session.commit()
+
+    headers = await login_headers(client, "range@test.com", "secret123")
+    filtered = await client.get(
+        "/api/v1/transactions",
+        headers=headers,
+        params={"start_date": "2026-05-01", "end_date": "2026-05-31"},
+    )
+    assert filtered.status_code == 200
+    assert filtered.json()["total"] == 2
+
+    invalid = await client.get(
+        "/api/v1/transactions",
+        headers=headers,
+        params={"start_date": "2026-06-10", "end_date": "2026-06-01"},
+    )
+    assert invalid.status_code == 422

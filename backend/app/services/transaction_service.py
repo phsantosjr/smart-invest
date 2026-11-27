@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -39,11 +40,17 @@ def _transaction_list_filters(
     current_user: User,
     *,
     brokerage_account_id: UUID | None,
+    start_date: date | None,
+    end_date: date | None,
 ) -> tuple:
     filters = [BrokerageAccount.user_id == current_user.id]
     if brokerage_account_id is not None:
         filters.append(Transaction.brokerage_account_id == brokerage_account_id)
-    return filters
+    if start_date is not None:
+        filters.append(Transaction.transaction_date >= start_date)
+    if end_date is not None:
+        filters.append(Transaction.transaction_date <= end_date)
+    return tuple(filters)
 
 
 async def list_transactions(
@@ -51,6 +58,8 @@ async def list_transactions(
     current_user: User,
     *,
     brokerage_account_id: UUID | None = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
     page: int = 1,
     page_size: int = DEFAULT_TRANSACTION_PAGE_SIZE,
 ) -> TransactionListResponse:
@@ -61,10 +70,14 @@ async def list_transactions(
             f"page_size deve estar entre 1 e {MAX_TRANSACTION_PAGE_SIZE}.",
             400,
         )
+    if start_date is not None and end_date is not None and start_date > end_date:
+        raise DomainError("start_date não pode ser posterior a end_date.", 422)
 
     filters = _transaction_list_filters(
         current_user,
         brokerage_account_id=brokerage_account_id,
+        start_date=start_date,
+        end_date=end_date,
     )
 
     count_stmt = (

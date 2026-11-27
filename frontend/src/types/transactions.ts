@@ -41,6 +41,8 @@ export type TransactionListResponse = {
 
 export type FetchTransactionsParams = {
   brokerage_account_id?: string;
+  start_date?: string;
+  end_date?: string;
   page?: number;
   page_size?: number;
 };

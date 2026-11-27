@@ -156,6 +156,45 @@ async def test_create_jcp_with_tax_withheld(
 
 
 @pytest.mark.asyncio
+async def test_create_duplicate_income_event_returns_409(
+    client: AsyncClient,
+    db_session: AsyncSession,
+):
+    user = await create_user(db_session, email="dup@test.com", password="secret123")
+    institution = await create_institution(db_session)
+    account = await create_brokerage_account(
+        db_session,
+        user=user,
+        institution=institution,
+    )
+    asset = await create_asset(db_session, ticker="VALE3", name="Vale")
+    headers = await login_headers(client, "dup@test.com", "secret123")
+
+    payload = {
+        "brokerage_account_id": str(account.id),
+        "asset_id": str(asset.id),
+        "income_type": "DIVIDEND",
+        "gross_amount": "50.00",
+        "tax_withheld": "0.00",
+        "net_amount": "50.00",
+        "payment_date": "2026-11-10",
+    }
+    first = await client.post("/api/v1/income-events", headers=headers, json=payload)
+    assert first.status_code == 201
+
+    duplicate = await client.post("/api/v1/income-events", headers=headers, json=payload)
+    assert duplicate.status_code == 409
+    assert "provento" in duplicate.json()["detail"].lower()
+
+    different_type = await client.post(
+        "/api/v1/income-events",
+        headers=headers,
+        json={**payload, "income_type": "JCP", "tax_withheld": "7.50", "net_amount": "42.50"},
+    )
+    assert different_type.status_code == 201
+
+
+@pytest.mark.asyncio
 async def test_income_event_rejects_net_mismatch(
     client: AsyncClient,
     db_session: AsyncSession,

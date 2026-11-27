@@ -8,6 +8,7 @@ from app.api.v1.income_events import router as income_events_router
 from app.api.v1.institutions import router as institutions_router
 from app.api.v1.market_prices import router as market_prices_router
 from app.api.v1.portfolio import router as portfolio_router
+from app.api.v1.projections import router as projections_router
 from app.api.v1.transactions import router as transactions_router
 
 api_router = APIRouter()
@@ -20,3 +21,4 @@ api_router.include_router(income_events_router)
 api_router.include_router(fixed_income_valuations_router)
 api_router.include_router(portfolio_router)
 api_router.include_router(market_prices_router)
+api_router.include_router(projections_router)

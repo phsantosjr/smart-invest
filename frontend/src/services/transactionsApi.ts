@@ -18,6 +18,8 @@ export async function fetchTransactions(
       ...(params?.brokerage_account_id
         ? { brokerage_account_id: params.brokerage_account_id }
         : {}),
+      ...(params?.start_date ? { start_date: params.start_date } : {}),
+      ...(params?.end_date ? { end_date: params.end_date } : {}),
     },
   });
   return data;
