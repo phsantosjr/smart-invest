@@ -11,6 +11,7 @@ import * as incomeEventsApi from "../src/services/incomeEventsApi";
 
 vi.mock("../src/services/incomeEventsApi", () => ({
   fetchIncomeSummaryByAsset: vi.fn(),
+  fetchIncomeEvents: vi.fn(),
   fetchIncomeMonthlyReport: vi.fn(),
   fetchReinvestmentAnalysis: vi.fn(),
 }));
@@ -22,6 +23,47 @@ vi.mock("../src/services/assetsApi", () => ({
 describe("DividendsPage", () => {
   beforeEach(() => {
     store.dispatch(setAccessToken("test-token"));
+    vi.mocked(incomeEventsApi.fetchIncomeEvents).mockResolvedValue({
+      total_net_amount: "225.0000",
+      items: [
+        {
+          id: "e1",
+          brokerage_account_id: "b1",
+          asset_id: "a3",
+          income_type: "FII_YIELD",
+          gross_amount: "50.0000",
+          tax_withheld: "0",
+          net_amount: "50.0000",
+          ex_date: null,
+          payment_date: "2025-06-01",
+          created_at: "2025-06-01T00:00:00Z",
+        },
+        {
+          id: "e2",
+          brokerage_account_id: "b1",
+          asset_id: "a1",
+          income_type: "DIVIDEND",
+          gross_amount: "75.0000",
+          tax_withheld: "0",
+          net_amount: "75.0000",
+          ex_date: null,
+          payment_date: "2026-03-15",
+          created_at: "2026-03-15T00:00:00Z",
+        },
+        {
+          id: "e3",
+          brokerage_account_id: "b1",
+          asset_id: "a2",
+          income_type: "DIVIDEND",
+          gross_amount: "100.0000",
+          tax_withheld: "0",
+          net_amount: "100.0000",
+          ex_date: null,
+          payment_date: "2026-08-20",
+          created_at: "2026-08-20T00:00:00Z",
+        },
+      ],
+    });
     vi.mocked(incomeEventsApi.fetchIncomeSummaryByAsset).mockResolvedValue({
       scope: "self",
       grand_total_net: "175.0000",
@@ -75,6 +117,31 @@ describe("DividendsPage", () => {
     expect(await screen.findByText("PETR4")).toBeTruthy();
     expect(screen.getByText("VALE3")).toBeTruthy();
     expect(screen.queryByText("HGLG11")).toBeNull();
+  });
+
+  it("shows consolidated chart views per asset group", async () => {
+    const { userEvent } = await import("@testing-library/user-event");
+    const user = userEvent.setup();
+
+    render(
+      <Provider store={store}>
+        <ThemeProvider>
+          <MemoryRouter>
+            <DividendsPage />
+          </MemoryRouter>
+        </ThemeProvider>
+      </Provider>,
+    );
+
+    await screen.findByText("HGLG11");
+    await user.click(screen.getByRole("button", { name: "Gráficos" }));
+    expect(await screen.findByText(/Total recebido por ano \(FIIs\)/i)).toBeTruthy();
+    expect(screen.getByLabelText(/Gráfico de proventos por ano — FIIs/i)).toBeTruthy();
+    expect(screen.getByLabelText(/Gráfico de proventos por ticker — FIIs/i)).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: "Dividendos de Ações" }));
+    expect(await screen.findByText(/Total recebido por ano \(ações\)/i)).toBeTruthy();
+    expect(screen.getByLabelText(/Gráfico de proventos por ticker — ações/i)).toBeTruthy();
   });
 
   it("switches to monthly and reinvestment tabs", async () => {

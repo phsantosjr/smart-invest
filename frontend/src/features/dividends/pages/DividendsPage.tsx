@@ -4,12 +4,20 @@ import { Link } from "react-router-dom";
 import { MaterialIcon } from "../../../components/MaterialIcon";
 import { getErrorMessage } from "../../../services/api";
 import { fetchAssets } from "../../../services/assetsApi";
+import { DividendsBarChart } from "../components/DividendsBarChart";
 import {
+  aggregateDividendsByTicker,
+  aggregateDividendsByYear,
+  filterEventsByAssetIds,
+} from "../utils/aggregateConsolidatedCharts";
+import {
+  fetchIncomeEvents,
   fetchIncomeMonthlyReport,
   fetchIncomeSummaryByAsset,
   fetchReinvestmentAnalysis,
 } from "../../../services/incomeEventsApi";
 import type { Asset } from "../../../types/assets";
+import type { IncomeEvent } from "../../../types/incomeEvents";
 import type {
   FiiReinvestmentItem,
   IncomeMonthlyRow,
@@ -21,6 +29,7 @@ import { assetTypeLabel } from "../../transactions/utils/assetDisplay";
 
 type DividendsTab = "consolidated" | "monthly" | "reinvestment";
 type ConsolidatedAssetGroup = "fii" | "stock";
+type ConsolidatedView = "table" | "charts";
 
 const CONSOLIDATED_GROUP_ASSET_TYPE: Record<ConsolidatedAssetGroup, string> = {
   fii: "FII",
@@ -107,7 +116,9 @@ function TabButton({
 
 function ConsolidatedTab() {
   const [group, setGroup] = useState<ConsolidatedAssetGroup>("fii");
+  const [view, setView] = useState<ConsolidatedView>("table");
   const [rows, setRows] = useState<IncomeAssetSummaryRow[]>([]);
+  const [incomeEvents, setIncomeEvents] = useState<IncomeEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -117,9 +128,13 @@ function ConsolidatedTab() {
       setLoading(true);
       setError(null);
       try {
-        const summary = await fetchIncomeSummaryByAsset({ scope: "self" });
+        const [summary, events] = await Promise.all([
+          fetchIncomeSummaryByAsset({ scope: "self" }),
+          fetchIncomeEvents({ scope: "self" }),
+        ]);
         if (active) {
           setRows(summary.rows);
+          setIncomeEvents(events.items);
         }
       } catch (loadError) {
         if (active) {
@@ -141,6 +156,26 @@ function ConsolidatedTab() {
     () =>
       rows.filter((row) => row.asset_type === CONSOLIDATED_GROUP_ASSET_TYPE[group]),
     [group, rows],
+  );
+
+  const filteredAssetIds = useMemo(
+    () => new Set(filteredRows.map((row) => row.asset_id)),
+    [filteredRows],
+  );
+
+  const filteredEvents = useMemo(
+    () => filterEventsByAssetIds(incomeEvents, filteredAssetIds),
+    [filteredAssetIds, incomeEvents],
+  );
+
+  const barsByYear = useMemo(
+    () => aggregateDividendsByYear(filteredEvents),
+    [filteredEvents],
+  );
+
+  const barsByTicker = useMemo(
+    () => aggregateDividendsByTicker(filteredRows),
+    [filteredRows],
   );
 
   const groupTotal = useMemo(
@@ -173,6 +208,20 @@ function ConsolidatedTab() {
         count={filteredRows.length}
       />
 
+      {!loading && !error && filteredRows.length > 0 ? (
+        <nav
+          className="mb-space-md flex flex-wrap gap-1 rounded-lg border border-outline-variant/20 bg-surface-container p-1"
+          aria-label="Visualização do consolidado"
+        >
+          <TabButton active={view === "table"} onClick={() => setView("table")}>
+            Tabela
+          </TabButton>
+          <TabButton active={view === "charts"} onClick={() => setView("charts")}>
+            Gráficos
+          </TabButton>
+        </nav>
+      ) : null}
+
       {error ? (
         <p role="alert" className="text-sm text-error">
           {error}
@@ -199,10 +248,47 @@ function ConsolidatedTab() {
             </>
           )}
         </p>
-      ) : (
+      ) : view === "table" ? (
         <DividendsByAssetTable rows={filteredRows} showAssetType={false} />
+      ) : (
+        <ConsolidatedCharts group={group} barsByYear={barsByYear} barsByTicker={barsByTicker} />
       )}
     </section>
+  );
+}
+
+function ConsolidatedCharts({
+  group,
+  barsByYear,
+  barsByTicker,
+}: {
+  group: ConsolidatedAssetGroup;
+  barsByYear: ReturnType<typeof aggregateDividendsByYear>;
+  barsByTicker: ReturnType<typeof aggregateDividendsByTicker>;
+}) {
+  const typeLabel = group === "fii" ? "FIIs" : "ações";
+  return (
+    <div className="flex flex-col gap-space-md">
+      <div className="rounded-xl border border-outline-variant/25 bg-surface-container-lowest p-space-md">
+        <h3 className="mb-space-sm text-xs font-semibold text-on-surface">
+          Total recebido por ano ({typeLabel})
+        </h3>
+        <DividendsBarChart
+          bars={barsByYear}
+          ariaLabel={`Gráfico de proventos por ano — ${typeLabel}`}
+        />
+      </div>
+      <div className="rounded-xl border border-outline-variant/25 bg-surface-container-lowest p-space-md">
+        <h3 className="mb-space-sm text-xs font-semibold text-on-surface">
+          Total recebido por ticker ({typeLabel})
+        </h3>
+        <DividendsBarChart
+          bars={barsByTicker}
+          ariaLabel={`Gráfico de proventos por ticker — ${typeLabel}`}
+          barClassName="bg-primary"
+        />
+      </div>
+    </div>
   );
 }
 

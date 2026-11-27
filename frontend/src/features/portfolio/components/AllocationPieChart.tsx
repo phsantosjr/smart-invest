@@ -1,5 +1,11 @@
 import { useMemo, useState } from "react";
+import { Cell, Pie, PieChart, Tooltip } from "recharts";
 
+import {
+  CHART_TOOLTIP_ITEM_STYLE,
+  CHART_TOOLTIP_LABEL_STYLE,
+  CHART_TOOLTIP_STYLE,
+} from "../../../components/charts/chartTheme";
 import type { AllocationSlice } from "../../../types/portfolio";
 import { formatBrl } from "../../../utils/money";
 
@@ -7,18 +13,16 @@ type AllocationPieChartProps = {
   allocation: AllocationSlice[];
 };
 
-const VIEWBOX = 200;
-const CENTER = VIEWBOX / 2;
-const RADIUS = 72;
-const STROKE_WIDTH = 28;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-
 function formatPercent(value: number): string {
   return `${value.toLocaleString("pt-BR", {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   })}%`;
 }
+
+const PIE_SIZE = 224;
+const INNER_RADIUS = 58;
+const OUTER_RADIUS = 86;
 
 export function AllocationPieChart({ allocation }: AllocationPieChartProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -35,14 +39,6 @@ export function AllocationPieChart({ allocation }: AllocationPieChartProps) {
     .map((slice) => `${slice.label} ${formatPercent(slice.percent)} (${slice.amount})`)
     .join(", ");
 
-  let dashOffset = 0;
-  const arcs = pieSlices.map((slice) => {
-    const dash = totalMarketValue > 0 ? (slice.value / totalMarketValue) * CIRCUMFERENCE : 0;
-    const offset = dashOffset;
-    dashOffset += dash;
-    return { slice, dash, offset };
-  });
-
   return (
     <section
       id="current-value-by-category"
@@ -58,51 +54,57 @@ export function AllocationPieChart({ allocation }: AllocationPieChartProps) {
       </header>
 
       <div className="grid grid-cols-1 items-center gap-space-lg md:grid-cols-[minmax(12rem,16rem)_1fr]">
-        <div className="relative mx-auto h-56 w-56">
-          <svg
-            viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
-            className="h-full w-full"
-            role="img"
-            aria-label={
-              pieSlices.length === 0
-                ? "Sem valor de mercado para exibir no gráfico"
-                : `Alocação por valor atual: ${summary}`
-            }
-          >
-            <circle
-              cx={CENTER}
-              cy={CENTER}
-              r={RADIUS}
-              fill="none"
-              className="stroke-surface-container-highest"
-              strokeWidth={STROKE_WIDTH}
-            />
-            {arcs.map(({ slice, dash, offset }) => (
-              <circle
-                key={slice.id}
-                cx={CENTER}
-                cy={CENTER}
-                r={RADIUS}
-                fill="none"
-                stroke={`var(${slice.colorVar})`}
-                strokeWidth={STROKE_WIDTH}
-                strokeDasharray={`${dash} ${CIRCUMFERENCE - dash}`}
-                strokeDashoffset={-offset}
-                transform={`rotate(-90 ${CENTER} ${CENTER})`}
-                className={
-                  hoveredId && hoveredId !== slice.id
-                    ? "opacity-45 transition-opacity duration-200 motion-reduce:transition-none"
-                    : "transition-opacity duration-200 motion-reduce:transition-none"
-                }
-                onMouseEnter={() => setHoveredId(slice.id)}
+        <div
+          className="relative mx-auto"
+          style={{ width: PIE_SIZE, height: PIE_SIZE }}
+          role="img"
+          aria-label={
+            pieSlices.length === 0
+              ? "Sem valor de mercado para exibir no gráfico"
+              : `Alocação por valor atual: ${summary}`
+          }
+        >
+          {pieSlices.length === 0 ? (
+            <div className="flex h-full w-full items-center justify-center rounded-full border border-outline-variant/30 bg-surface-container" />
+          ) : (
+            <PieChart width={PIE_SIZE} height={PIE_SIZE}>
+              <Pie
+                data={pieSlices}
+                dataKey="value"
+                nameKey="label"
+                cx="50%"
+                cy="50%"
+                innerRadius={INNER_RADIUS}
+                outerRadius={OUTER_RADIUS}
+                paddingAngle={1}
+                onMouseEnter={(_, index) => {
+                  const slice = pieSlices[index];
+                  if (slice) setHoveredId(slice.id);
+                }}
                 onMouseLeave={() => setHoveredId(null)}
               >
-                <title>
-                  {slice.label}: {slice.amount} ({formatPercent(slice.percent)})
-                </title>
-              </circle>
-            ))}
-          </svg>
+                {pieSlices.map((slice) => (
+                  <Cell
+                    key={slice.id}
+                    fill={`var(${slice.colorVar})`}
+                    opacity={hoveredId && hoveredId !== slice.id ? 0.45 : 1}
+                    stroke="var(--si-surface-container-lowest)"
+                    strokeWidth={1}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={CHART_TOOLTIP_STYLE}
+                labelStyle={CHART_TOOLTIP_LABEL_STYLE}
+                itemStyle={CHART_TOOLTIP_ITEM_STYLE}
+                formatter={(value, _name, item) => {
+                  const slice = item.payload as AllocationSlice;
+                  const num = typeof value === "number" ? value : Number(value);
+                  return [`${formatBrl(num)} (${formatPercent(slice.percent)})`, slice.label];
+                }}
+              />
+            </PieChart>
+          )}
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-space-lg text-center">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">
               Total
