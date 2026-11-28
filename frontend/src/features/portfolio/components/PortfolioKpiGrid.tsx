@@ -1,3 +1,4 @@
+import { SensitiveText } from "../../../components/SensitiveText";
 import type { KpiMetric } from "../../../types/portfolio";
 import { MaterialIcon } from "../../../components/MaterialIcon";
 
@@ -32,16 +33,19 @@ function KpiCard({ kpi }: { kpi: KpiMetric }) {
         />
       </div>
       <div className="mt-space-sm">
-        <p className={`font-headline text-2xl font-bold tracking-tight tabular-nums ${valueClass}`}>
+        <SensitiveText
+          as="p"
+          className={`font-headline text-2xl font-bold tracking-tight tabular-nums ${valueClass}`}
+        >
           {kpi.value}
-        </p>
+        </SensitiveText>
         {kpi.delta ? (
           <div className="mt-1 flex items-center gap-space-xs">
             <span className={`flex items-center text-xs tabular-nums ${deltaClass}`}>
               {kpi.id === "net-worth" ? (
                 <MaterialIcon name="arrow_upward" size={14} className="mr-0.5" />
               ) : null}
-              {kpi.delta}
+              <SensitiveText>{kpi.delta}</SensitiveText>
             </span>
             {kpi.deltaHint ? (
               <span className="text-xs text-on-surface-variant">{kpi.deltaHint}</span>
@@ -66,13 +70,13 @@ function KpiCard({ kpi }: { kpi: KpiMetric }) {
         <div className="mt-space-md flex items-center justify-between pt-space-xs text-[11px] text-on-surface-variant">
           <span>{kpi.footer.left}</span>
           {kpi.footer.right ? (
-            <span
+            <SensitiveText
               className={`font-medium tabular-nums ${
                 kpi.footer.right.startsWith("-") ? "text-error" : "text-on-surface"
               }`}
             >
               {kpi.footer.right}
-            </span>
+            </SensitiveText>
           ) : null}
         </div>
       ) : null}

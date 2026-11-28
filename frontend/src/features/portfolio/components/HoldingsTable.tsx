@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { SensitiveText } from "../../../components/SensitiveText";
 import type { HoldingRow } from "../../../types/portfolio";
 import { MaterialIcon } from "../../../components/MaterialIcon";
 import { UpdateMarketPriceModal } from "./UpdateMarketPriceModal";
@@ -106,16 +107,16 @@ export function HoldingsTable({
                   </div>
                 </td>
                 <td className="px-space-xs py-2.5 text-right text-sm tabular-nums text-on-surface">
-                  {row.quantity}
+                  <SensitiveText>{row.quantity}</SensitiveText>
                 </td>
                 <td className="px-space-xs py-2.5 text-right text-sm tabular-nums text-on-surface-variant">
-                  {row.averagePrice}
+                  <SensitiveText>{row.averagePrice}</SensitiveText>
                 </td>
                 <td className="px-space-xs py-2.5 text-right text-sm tabular-nums text-on-surface">
                   <PriceCell row={row} />
                 </td>
                 <td className="px-space-xs py-2.5 text-right text-sm font-semibold tabular-nums text-on-surface">
-                  {row.netPosition}
+                  <SensitiveText>{row.netPosition}</SensitiveText>
                 </td>
                 <td
                   className={[
@@ -123,7 +124,7 @@ export function HoldingsTable({
                     row.returnTone === "gain" ? "text-b3-green" : "text-error",
                   ].join(" ")}
                 >
-                  {row.totalReturn}
+                  <SensitiveText>{row.totalReturn}</SensitiveText>
                 </td>
                 <td className="px-space-xs py-2.5 text-center">
                   {VARIABLE_INCOME_TYPES.has(row.assetType) ? (
@@ -178,7 +179,7 @@ export function HoldingsTable({
 function PriceCell({ row }: { row: HoldingRow }) {
   return (
     <div className="flex flex-col items-end gap-0.5">
-      <span>{row.currentPrice}</span>
+      <SensitiveText>{row.currentPrice}</SensitiveText>
       {row.lastQuotedAt ? (
         <span className="text-[10px] tabular-nums text-on-surface-variant">
           {row.lastQuotedAt}

@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 
+import { registerValuesHiddenReader } from "../utils/money";
 import accountsReducer from "../features/accounts/accountsSlice";
 import assetsReducer from "../features/assets/assetsSlice";
 import authReducer, { logout } from "../features/auth/authSlice";
@@ -16,6 +17,8 @@ export const store = configureStore({
     ui: uiReducer,
   },
 });
+
+registerValuesHiddenReader(() => store.getState().ui.valuesHidden);
 
 injectStore({
   getState: store.getState,

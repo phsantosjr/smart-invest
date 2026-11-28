@@ -17,3 +17,4 @@ O frontend é uma Single Page Application (SPA) construída com **React**, **Typ
 * Isolar o estado de desafio 2FA (`tempToken`, `requires2fa`) no `authSlice` para não vazar para o estado autenticado antes da confirmação do código de 6 dígitos.
 * Manter valores monetários e quantidades em strings ou formatos seguros de precisão até a formatação final em `BRL` (`pt-BR`), evitando arredondamentos acidentais durante cálculos ou filtros no cliente.
 * Persistir a preferência de tema (`dark` / `light`) no estado da UI e no `localStorage`.
+* **Privacidade de valores:** `ui.valuesHidden` (toggle no header, ícone `visibility`), persistido em `smart-invest-values-hidden`. Formatadores em `utils/money.ts` e `SensitiveText` para strings pré-formatadas no Redux.

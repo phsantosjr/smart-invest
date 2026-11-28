@@ -3,7 +3,8 @@ import type { Asset } from "../../../types/assets";
 import type { FixedIncomeValuation } from "../../../types/fixedIncomeValuation";
 import type { PortfolioPosition } from "../../../types/portfolioApi";
 import type { UserProfile } from "../../../types/user";
-import { formatBrl } from "../../../utils/money";
+import { areFinancialValuesHidden, formatBrl } from "../../../utils/money";
+import { HIDDEN_PERCENT_LABEL } from "../../../utils/financialPrivacy";
 import { shortDisplayName, userInitials } from "../../../utils/userDisplay";
 import {
   detectInstrumentBadge,
@@ -227,6 +228,9 @@ export function formatSignedBrl(value: number): string {
 }
 
 export function formatSignedPercent(value: number): string {
+  if (areFinancialValuesHidden()) {
+    return HIDDEN_PERCENT_LABEL;
+  }
   const prefix = value > 0 ? "+" : "";
   return `${prefix}${value.toFixed(2).replace(".", ",")}%`;
 }

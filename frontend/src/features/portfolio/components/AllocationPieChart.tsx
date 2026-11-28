@@ -7,13 +7,19 @@ import {
   CHART_TOOLTIP_STYLE,
 } from "../../../components/charts/chartTheme";
 import type { AllocationSlice } from "../../../types/portfolio";
+import { SensitiveText } from "../../../components/SensitiveText";
+import { useFinancialValuesHidden } from "../../../hooks/useFinancialValuesHidden";
+import { HIDDEN_PERCENT_LABEL } from "../../../utils/financialPrivacy";
 import { formatBrl } from "../../../utils/money";
 
 type AllocationPieChartProps = {
   allocation: AllocationSlice[];
 };
 
-function formatPercent(value: number): string {
+function formatPercent(value: number, valuesHidden: boolean): string {
+  if (valuesHidden) {
+    return HIDDEN_PERCENT_LABEL;
+  }
   return `${value.toLocaleString("pt-BR", {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -25,6 +31,7 @@ const INNER_RADIUS = 58;
 const OUTER_RADIUS = 86;
 
 export function AllocationPieChart({ allocation }: AllocationPieChartProps) {
+  const valuesHidden = useFinancialValuesHidden();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const totalMarketValue = useMemo(
     () => allocation.reduce((sum, slice) => sum + slice.value, 0),
@@ -36,7 +43,10 @@ export function AllocationPieChart({ allocation }: AllocationPieChartProps) {
   );
   const totalLabel = formatBrl(totalMarketValue);
   const summary = pieSlices
-    .map((slice) => `${slice.label} ${formatPercent(slice.percent)} (${slice.amount})`)
+    .map(
+      (slice) =>
+        `${slice.label} ${formatPercent(slice.percent, valuesHidden)} (${slice.amount})`,
+    )
     .join(", ");
 
   return (
@@ -100,7 +110,10 @@ export function AllocationPieChart({ allocation }: AllocationPieChartProps) {
                 formatter={(value, _name, item) => {
                   const slice = item.payload as AllocationSlice;
                   const num = typeof value === "number" ? value : Number(value);
-                  return [`${formatBrl(num)} (${formatPercent(slice.percent)})`, slice.label];
+                  return [
+                    `${formatBrl(num)} (${formatPercent(slice.percent, valuesHidden)})`,
+                    slice.label,
+                  ];
                 }}
               />
             </PieChart>
@@ -109,9 +122,9 @@ export function AllocationPieChart({ allocation }: AllocationPieChartProps) {
             <span className="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">
               Total
             </span>
-            <span className="font-headline text-sm font-bold tabular-nums text-on-surface">
+            <SensitiveText className="font-headline text-sm font-bold tabular-nums text-on-surface">
               {totalLabel}
-            </span>
+            </SensitiveText>
           </div>
         </div>
 
@@ -154,10 +167,12 @@ export function AllocationPieChart({ allocation }: AllocationPieChartProps) {
                       </span>
                     </th>
                     <td className="px-space-xs py-space-sm text-right tabular-nums text-on-surface">
-                      {slice.amount}
+                      <SensitiveText>{slice.amount}</SensitiveText>
                     </td>
                     <td className="px-space-xs py-space-sm text-right tabular-nums text-on-surface-variant">
-                      {formatPercent(slice.percent)}
+                      <SensitiveText>
+                        {formatPercent(slice.percent, valuesHidden)}
+                      </SensitiveText>
                     </td>
                   </tr>
                 );

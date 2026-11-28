@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { SensitiveText } from "../../../components/SensitiveText";
 import type { PortfolioScopeId } from "../../../types/portfolio";
 import { MaterialIcon } from "../../../components/MaterialIcon";
 import { setPortfolioScope } from "../portfolioSlice";
@@ -51,14 +52,14 @@ export function PortfolioScopeBar({ onQuotesSynced }: PortfolioScopeBarProps) {
                 {member.name}
                 {member.roleLabel ? ` (${member.roleLabel})` : ""}
               </span>
-              <span
+              <SensitiveText
                 className={[
                   "font-medium tabular-nums",
                   isActive ? "text-secondary" : "text-on-surface-variant",
                 ].join(" ")}
               >
                 {member.netWorth}
-              </span>
+              </SensitiveText>
             </button>
           );
         })}

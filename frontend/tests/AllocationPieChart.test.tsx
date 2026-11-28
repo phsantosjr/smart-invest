@@ -1,7 +1,10 @@
+import { configureStore } from "@reduxjs/toolkit";
 import { render, screen } from "@testing-library/react";
+import { Provider } from "react-redux";
 import { describe, expect, it } from "vitest";
 
 import { AllocationPieChart } from "../src/features/portfolio/components/AllocationPieChart";
+import uiReducer from "../src/features/ui/uiSlice";
 import type { AllocationSlice } from "../src/types/portfolio";
 
 const slices: AllocationSlice[] = [
@@ -43,9 +46,23 @@ const slices: AllocationSlice[] = [
   },
 ];
 
+function renderChart(allocation: AllocationSlice[]) {
+  const store = configureStore({
+    reducer: { ui: uiReducer },
+    preloadedState: {
+      ui: { themeMode: "light" as const, sidebarCollapsed: false, valuesHidden: false },
+    },
+  });
+  return render(
+    <Provider store={store}>
+      <AllocationPieChart allocation={allocation} />
+    </Provider>,
+  );
+}
+
 describe("AllocationPieChart", () => {
   it("renders current value totals by category in a table next to the pie", () => {
-    render(<AllocationPieChart allocation={slices} />);
+    renderChart(slices);
 
     expect(screen.getByRole("heading", { name: "Valor atual por categoria" })).toBeTruthy();
     expect(screen.getByRole("img", { name: /Alocação por valor atual/i })).toBeTruthy();
@@ -56,7 +73,7 @@ describe("AllocationPieChart", () => {
   });
 
   it("shows an empty message when there is no allocation data", () => {
-    render(<AllocationPieChart allocation={[]} />);
+    renderChart([]);
 
     expect(
       screen.getByText("Nenhuma posição com valor para exibir no gráfico."),

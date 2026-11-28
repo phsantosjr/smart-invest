@@ -1,10 +1,22 @@
 import { describe, expect, it } from "vitest";
 
-import uiReducer, { hydrateTheme, setThemeMode, toggleThemeMode } from "../src/features/ui/uiSlice";
+import uiReducer, {
+  hydrateTheme,
+  setThemeMode,
+  setValuesHidden,
+  toggleThemeMode,
+  toggleValuesHidden,
+} from "../src/features/ui/uiSlice";
+
+const baseUi = {
+  themeMode: "light" as const,
+  sidebarCollapsed: false,
+  valuesHidden: false,
+};
 
 describe("uiSlice", () => {
   it("toggles between light and dark", () => {
-    const dark = uiReducer({ themeMode: "light" }, toggleThemeMode());
+    const dark = uiReducer(baseUi, toggleThemeMode());
     expect(dark.themeMode).toBe("dark");
 
     const light = uiReducer(dark, toggleThemeMode());
@@ -12,7 +24,15 @@ describe("uiSlice", () => {
   });
 
   it("sets and hydrates theme mode", () => {
-    expect(uiReducer({ themeMode: "light" }, setThemeMode("dark")).themeMode).toBe("dark");
-    expect(uiReducer({ themeMode: "dark" }, hydrateTheme("light")).themeMode).toBe("light");
+    expect(uiReducer(baseUi, setThemeMode("dark")).themeMode).toBe("dark");
+    expect(uiReducer({ ...baseUi, themeMode: "dark" }, hydrateTheme("light")).themeMode).toBe(
+      "light",
+    );
+  });
+
+  it("toggles financial values visibility", () => {
+    const hidden = uiReducer(baseUi, toggleValuesHidden());
+    expect(hidden.valuesHidden).toBe(true);
+    expect(uiReducer(hidden, setValuesHidden(false)).valuesHidden).toBe(false);
   });
 });

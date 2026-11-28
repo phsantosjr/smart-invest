@@ -1,5 +1,7 @@
 import { useAppSelector } from "../../app/hooks";
+import { HIDDEN_MONEY_LABEL, HIDDEN_PERCENT_LABEL } from "../../utils/financialPrivacy";
 import { MaterialIcon } from "../MaterialIcon";
+import { ValuesVisibilityToggle } from "../ValuesVisibilityToggle";
 
 type AppHeaderProps = {
   breadcrumb: string;
@@ -8,6 +10,7 @@ type AppHeaderProps = {
 
 export function AppHeader({ breadcrumb, sidebarCollapsed }: AppHeaderProps) {
   const currentUser = useAppSelector((state) => state.auth.currentUser);
+  const valuesHidden = useAppSelector((state) => state.ui.valuesHidden);
   const ownerLabel = currentUser?.is_household_owner ? "Titular" : "Membro";
 
   return (
@@ -23,13 +26,26 @@ export function AppHeader({ breadcrumb, sidebarCollapsed }: AppHeaderProps) {
           <span className="font-semibold text-on-surface">{breadcrumb}</span>
         </div>
         <div className="hidden items-center gap-space-sm text-xs font-medium tabular-nums xl:flex">
-          <MacroChip label="IPCA" value="+6,25%" valueClassName="text-secondary" />
-          <MacroChip label="CDI" value="10,40%" valueClassName="text-secondary" />
-          <MacroChip label="USD" value="R$ 5,72" valueClassName="text-tertiary" />
+          <MacroChip
+            label="IPCA"
+            value={valuesHidden ? HIDDEN_PERCENT_LABEL : "+6,25%"}
+            valueClassName="text-secondary"
+          />
+          <MacroChip
+            label="CDI"
+            value={valuesHidden ? HIDDEN_PERCENT_LABEL : "10,40%"}
+            valueClassName="text-secondary"
+          />
+          <MacroChip
+            label="USD"
+            value={valuesHidden ? HIDDEN_MONEY_LABEL : "R$ 5,72"}
+            valueClassName="text-tertiary"
+          />
         </div>
       </div>
 
       <div className="flex items-center gap-space-md">
+        <ValuesVisibilityToggle />
         <button
           type="button"
           aria-label="Notificações"

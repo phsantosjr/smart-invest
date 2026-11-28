@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useFinancialValuesHidden } from "../hooks/useFinancialValuesHidden";
 import { AppHeader } from "../components/shell/AppHeader";
 import { AppSidebar } from "../components/shell/AppSidebar";
 import { loadCurrentUser } from "../features/auth/authSlice";
@@ -33,6 +34,11 @@ function resolveBreadcrumb(pathname: string): string {
   return "App";
 }
 
+function RoutedOutlet() {
+  const valuesHidden = useFinancialValuesHidden();
+  return <Outlet key={valuesHidden ? "privacy-on" : "privacy-off"} />;
+}
+
 export function AppShell() {
   const dispatch = useAppDispatch();
   const location = useLocation();
@@ -54,7 +60,7 @@ export function AppShell() {
       <div className={sidebarCollapsed ? "pl-16" : "pl-64"}>
         <AppHeader breadcrumb={breadcrumb} sidebarCollapsed={sidebarCollapsed} />
         <main className="relative min-h-screen w-full bg-surface px-space-lg pb-space-xl pt-16">
-          <Outlet />
+          <RoutedOutlet />
         </main>
       </div>
     </div>

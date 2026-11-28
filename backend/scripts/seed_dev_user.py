@@ -12,8 +12,8 @@ from app.core.database import async_session_factory
 from app.core.security import hash_password
 from app.models.user import User
 
-DEV_EMAIL = "ph@phgr.tech"
-DEV_PASSWORD = ""
+DEV_EMAIL = "test@test.io"
+DEV_PASSWORD = "test123##@@"
 
 
 async def seed() -> None:
